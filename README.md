@@ -8,6 +8,19 @@
 
 In a world where fake news spreads faster than facts on messaging apps, FactSaathi provides a frictionless solution: **Just forward the message, and get the truth.**
 
+## 📸 Project Screenshots
+<br>
+<p align="center">
+  <img src="screenshots/screenshot-one.png" alt="Welcome Screen" width="80%">
+  <br>
+  <br>
+  <img src="screenshots/screenshot-two.png" alt="Chat Result" width="80%">
+  <br>
+  <br>
+  <img src="screenshots/screenshot-three.png" alt="Fact Anser" width="80%">
+  <br>
+</p>
+
 ## 🚀 Key Features
 
 * **📲 Native WhatsApp-like Interface:** A fully functional React-based chat simulation (Mock Environment) that feels intuitive to users.
@@ -24,6 +37,70 @@ In a world where fake news spreads faster than facts on messaging apps, FactSaat
 * **AI Model:** Google Gemini 2.5 Flash Preview
 * **Search Tool:** Tavily AI Search
 * **Icons:** Lucide React
+
+## 💻 How to Run Locally
+**⚙️ Installation & Setup**
+
+Prerequisites
+
+Node.js & npm
+
+Python 3.8+
+
+API Keys for Google Gemini and Tavily
+
+**1. Clone the Repository**
+
+```
+git clone https://github.com/amrshaikh/factsaathi.git
+cd factsaathi
+```
+
+
+**2. Backend Setup**
+
+```
+cd backend
+# Create virtual environment (optional but recommended)
+python -m venv venv
+# Activate venv (Windows: venv\Scripts\activate | Mac/Linux: source venv/bin/activate)
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+
+**Configure Environment Variables:**
+
+Create a .env file in the backend/ folder:
+
+```
+GEMINI_API_KEY=your_google_key_here
+TAVILY_API_KEY=your_tavily_key_here
+```
+
+
+Run Server:
+
+```
+python -m uvicorn main:app --reload
+```
+Server starts at [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+
+**3. Frontend Setup**
+
+Open a new terminal:
+
+```
+cd frontend
+npm install
+npm run dev
+```
+App starts at http://localhost:5173
+
+
+
 
 ## 🗺️ Roadmap
 
