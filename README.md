@@ -1,2 +1,40 @@
-# factsaathi
-Turning fakes into facts, empowering society by AI
+# FactSaathi 🤖✅
+
+**Turning fakes into facts, empowering society with AI.**
+
+## 📖 Overview
+
+**FactSaathi** is an AI-powered misinformation combat agent integrated into a familiar chat interface. It acts as a digital companion that helps users verify forwarded news, rumors, and suspicious claims instantly.
+
+In a world where fake news spreads faster than facts on messaging apps, FactSaathi provides a frictionless solution: **Just forward the message, and get the truth.**
+
+## 🚀 Key Features
+
+* **📲 Native WhatsApp-like Interface:** A fully functional React-based chat simulation (Mock Environment) that feels intuitive to users.
+* **↪️ "Forward to Verify" Workflow:** Seamlessly forward suspicious messages from family groups directly to the FactSaathi bot.
+* **🧠 Agentic AI Backend:** Powered by **Google Gemini 2.5 Flash**, the agent understands context, tone, and intent.
+* **🕵️ Real-Time Fact Checking:** Uses **Tavily Search API** to cross-reference claims against trusted sources (WHO, PIB, News Outlets) in real-time.
+* **🛡️ Strict Guardrails:** The bot refuses casual chat/small talk and focuses strictly on fact-checking to maintain professional utility.
+* **✅ Visual Verdicts:** Clear visual indicators (Green Tick ✅ / Red Cross ❌) and formatted reports for easy reading.
+
+## 🛠️ Tech Stack
+
+* **Frontend:** React.js, Vite, CSS (WhatsApp Web Replica)
+* **Backend:** Python, FastAPI
+* **AI Model:** Google Gemini 2.5 Flash Preview
+* **Search Tool:** Tavily AI Search
+* **Icons:** Lucide React
+
+## 🗺️ Roadmap
+
+**Multilingual Support:** Support for Hindi, Marathi, and regional languages.
+
+**Image Verification:** Reverse image search for fake screenshots/media.
+
+**WhatsApp Business API:** Live integration into the real WhatsApp ecosystem.
+
+## 👥 Team PromptCraft
+
+Members: Amr, Uzair, Talha & Abdurrahman
+
+Built with ❤️ during the Hackathon.
