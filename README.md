@@ -14,6 +14,9 @@ In a world where fake news spreads faster than facts on messaging apps, FactSaat
   <img src="screenshots/screenshot-one.png" alt="Welcome Screen" width="80%">
   <br>
   <br>
+  <img src="screenshots/screenshot-four.png" alt="Chat Forward" width="80%">
+  <br>
+  <br>
   <img src="screenshots/screenshot-two.png" alt="Chat Result" width="80%">
   <br>
   <br>
