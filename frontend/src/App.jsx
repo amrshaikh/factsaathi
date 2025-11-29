@@ -13,8 +13,6 @@ import {
   ShieldCheck,
   Smartphone
 } from 'lucide-react';
-import Avatars from '@dicebear/avatars';
-import style from '@dicebear/avatars-avataaars-sprites';
 
 // --- RICH MOCK DATA ---
 const MOCK_CHATS = {
@@ -153,37 +151,7 @@ const MOCK_CHATS = {
   }
 };
 
-// Generate local avatar SVG data URLs using DiceBear Avataaars
-const _avatars = new Avatars(style, {});
-
-function makeAvatarDataUrl(seed, opts = {}) {
-  // Enforce male-leaning defaults (short hair styles) unless overridden
-  const defaults = { top: 'shortHairShortFlat' };
-  try {
-    const svg = _avatars.create(seed, { ...defaults, ...opts });
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-  } catch (e) {
-    // Fallback: return a minimal SVG data URI
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" rx="16" fill="#eee"/></svg>');
-  }
-}
-
-const ROBOT_SVG = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
-  <rect width="96" height="96" rx="16" fill="#eceff1"/>
-  <text x="50%" y="52%" font-size="48" text-anchor="middle" dominant-baseline="middle">🤖</text>
-  <text x="48" y="88" font-size="10" text-anchor="middle" fill="#263238">FactSaathi</text>
-</svg>`;
-
-// Apply avatars: private chats -> avataaars (male-style), bot -> robot SVG
-Object.values(MOCK_CHATS).forEach((chat) => {
-  if (chat.type === 'bot') {
-    chat.avatar = 'data:image/svg+xml;utf8,' + encodeURIComponent(ROBOT_SVG);
-  } else {
-    // enforce male hair styles via default top in makeAvatarDataUrl; add slight variation via seed
-    chat.avatar = makeAvatarDataUrl(`${chat.name}-${chat.id}`);
-  }
-});
+// (No external avatar libraries in use — avatars will be initial-based SVGs)
 
 // Replace avatars with simple initial-based SVGs for all users (deterministic colors)
 function hashToColor(s) {
@@ -328,7 +296,7 @@ function App() {
       <div className="sidebar">
         <div className="header">
           <div className="user-avatar">
-            {/* USER AVATAR - generated via DiceBear */}
+            {/* USER AVATAR - initial-based SVG */}
             <img src={HEADER_USER_AVATAR} alt="Me" />
           </div>
           <div className="header-icons">
