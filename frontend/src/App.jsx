@@ -13,13 +13,15 @@ import {
   ShieldCheck,
   Smartphone
 } from 'lucide-react';
+import Avatars from '@dicebear/avatars';
+import style from '@dicebear/avatars-avataaars-sprites';
 
 // --- RICH MOCK DATA ---
 const MOCK_CHATS = {
   // BOT (Pinned Top)
   0: {
     id: 0,
-    name: "FactSaathi",
+    name: "FactSaathi Bot",
     // Normal Robot Avatar
     avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Robot123", 
     type: "bot",
@@ -151,6 +153,76 @@ const MOCK_CHATS = {
   }
 };
 
+// Generate local avatar SVG data URLs using DiceBear Avataaars
+const _avatars = new Avatars(style, {});
+
+function makeAvatarDataUrl(seed, opts = {}) {
+  // Enforce male-leaning defaults (short hair styles) unless overridden
+  const defaults = { top: 'shortHairShortFlat' };
+  try {
+    const svg = _avatars.create(seed, { ...defaults, ...opts });
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  } catch (e) {
+    // Fallback: return a minimal SVG data URI
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" rx="16" fill="#eee"/></svg>');
+  }
+}
+
+const ROBOT_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <rect width="96" height="96" rx="16" fill="#eceff1"/>
+  <text x="50%" y="52%" font-size="48" text-anchor="middle" dominant-baseline="middle">🤖</text>
+  <text x="48" y="88" font-size="10" text-anchor="middle" fill="#263238">FactSaathi</text>
+</svg>`;
+
+// Apply avatars: private chats -> avataaars (male-style), bot -> robot SVG
+Object.values(MOCK_CHATS).forEach((chat) => {
+  if (chat.type === 'bot') {
+    chat.avatar = 'data:image/svg+xml;utf8,' + encodeURIComponent(ROBOT_SVG);
+  } else {
+    // enforce male hair styles via default top in makeAvatarDataUrl; add slight variation via seed
+    chat.avatar = makeAvatarDataUrl(`${chat.name}-${chat.id}`);
+  }
+});
+
+// Replace avatars with simple initial-based SVGs for all users (deterministic colors)
+function hashToColor(s) {
+  const colors = ["#f44336", "#e91e63", "#9c27b0", "#3f51b5", "#2196f3", "#03a9f4", "#009688", "#4caf50", "#8bc34a", "#ffc107", "#ff9800", "#795548"];
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
+  return colors[Math.abs(h) % colors.length];
+}
+
+function makeInitialSvg(name, size = 96) {
+  const initial = (name && String(name).trim()[0]) ? String(name).trim()[0].toUpperCase() : '?';
+  const bg = hashToColor(name || initial);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
+    `<rect width="${size}" height="${size}" rx="${Math.floor(size*0.16)}" fill="${bg}"/>` +
+    `<text x="50%" y="52%" font-family="Arial, Helvetica, sans-serif" font-size="${Math.floor(size*0.45)}" text-anchor="middle" dominant-baseline="middle" fill="#ffffff">${initial}</text>` +
+    `</svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+// Header user avatar: use initial 'U' for user
+const HEADER_USER_AVATAR = makeInitialSvg('User');
+
+// Apply initials to all chats (including bot)
+Object.values(MOCK_CHATS).forEach((chat) => {
+  chat.avatar = makeInitialSvg(chat.name || String(chat.id));
+});
+
+// Ensure the bot has a robot emoji avatar (override initial)
+const botChat = Object.values(MOCK_CHATS).find(c => c.type === 'bot' || c.id === 0);
+if (botChat) {
+  const robotSvg = `<?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+    <rect width="96" height="96" rx="16" fill="#eceff1"/>
+    <text x="50%" y="52%" font-size="48" text-anchor="middle" dominant-baseline="middle">🤖</text>
+    <text x="48" y="88" font-size="10" text-anchor="middle" fill="#263238">FactSaathi Bot</text>
+  </svg>`;
+  botChat.avatar = 'data:image/svg+xml;utf8,' + encodeURIComponent(robotSvg);
+}
+
 function App() {
   const [activeChatId, setActiveChatId] = useState(null);
   const [chats, setChats] = useState(MOCK_CHATS);
@@ -172,8 +244,9 @@ function App() {
 
   const handleForward = (text) => {
     setActiveChatId(0); // Switch to FactSaathi
-    setInputText(text); // Paste text
     setMenuOpenId(null); // Close menu
+    // Directly send the forwarded text to FactSaathi (chat id 0)
+    sendMessageText(text, 0);
   };
 
   const formatText = (text) => {
@@ -186,23 +259,27 @@ function App() {
     });
   };
 
-  const handleSend = async () => {
-    if (!inputText.trim()) return;
+  // Generic function to send a message to a specific chat id. Used by both send and forward.
+  const sendMessageText = async (text, chatId) => {
+    if (!text || !String(text).trim()) return;
 
-    const userMsg = { 
-      id: Date.now(), 
-      text: inputText, 
-      sender: "me", 
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+    const userMsg = {
+      id: Date.now(),
+      text: text,
+      sender: 'me',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     const updatedChats = { ...chats };
-    updatedChats[activeChatId].messages.push(userMsg);
+    // Ensure target chat exists
+    if (!updatedChats[chatId]) return;
+    updatedChats[chatId].messages.push(userMsg);
     setChats(updatedChats);
+    // Clear input box if we're sending from the UI
     setInputText("");
 
-    // If talking to Bot (ID 0)
-    if (activeChatId === 0) {
+    // If sending to the bot (FactSaathi) trigger bot verification flow
+    if (chatId === 0) {
       setIsLoading(true);
       try {
         const response = await fetch("http://127.0.0.1:8000/verify", {
@@ -212,22 +289,22 @@ function App() {
         });
 
         const data = await response.json();
-        const botMsg = { 
-          id: Date.now() + 1, 
-          text: data.verdict || "Unable to verify at this moment.", 
-          sender: "them", 
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        const botMsg = {
+          id: Date.now() + 1,
+          text: data.verdict || "Unable to verify at this moment.",
+          sender: "them",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
-        
+
         updatedChats[0].messages.push(botMsg);
         setChats({ ...updatedChats });
 
       } catch (error) {
-        const botMsg = { 
-          id: Date.now() + 1, 
-          text: "**Verdict:** Connection Error ⚠️\n\nPlease ensure the **FactSaathi** backend is running.", 
-          sender: "them", 
-          time: "Now" 
+        const botMsg = {
+          id: Date.now() + 1,
+          text: "**Verdict:** Connection Error ⚠️\n\nPlease ensure the **FactSaathi** backend is running.",
+          sender: "them",
+          time: "Now"
         };
         updatedChats[0].messages.push(botMsg);
         setChats({ ...updatedChats });
@@ -235,6 +312,11 @@ function App() {
         setIsLoading(false);
       }
     }
+  };
+
+  const handleSend = async () => {
+    // send message to currently active chat
+    await sendMessageText(inputText, activeChatId);
   };
 
   const activeChat = activeChatId !== null ? chats[activeChatId] : null;
@@ -246,8 +328,8 @@ function App() {
       <div className="sidebar">
         <div className="header">
           <div className="user-avatar">
-            {/* USER AVATAR - Illustrated Guy */}
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Me" />
+            {/* USER AVATAR - generated via DiceBear */}
+            <img src={HEADER_USER_AVATAR} alt="Me" />
           </div>
           <div className="header-icons">
             <div className="icon-btn"><MoreVertical size={20} /></div>

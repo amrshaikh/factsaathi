@@ -67,11 +67,14 @@ body::after {
 }
 
 .user-avatar img, .chat-avatar img {
+  display: block;
   height: 40px;
   width: 40px;
   border-radius: 50%;
   cursor: pointer;
   object-fit: cover;
+  background-color: #fff; /* fallback if SVG has transparency or fails to load */
+  border: 1px solid rgba(0,0,0,0.03);
 }
 
 .header-icons {
